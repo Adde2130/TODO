@@ -50,11 +50,13 @@ def print_todo_file(file_path):
         while line_full := file.readline():
             i += 1
             line = line_full.strip()
-            if "TODO:" in line:
+            index = line.find("TODO")
+            if index != -1:
                 box_char = bytes([192]).decode('cp437')
                 line_char = bytes([196]).decode('cp437')
 
-                print(f"    {box_char}{line_char} {line} \x1b[93m(line {i})\x1b[39m")
+
+                print(f"    {box_char}{line_char} * {line[index:]} \x1b[93m(line {i})\x1b[39m")
 
 
 def main():
