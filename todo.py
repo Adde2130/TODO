@@ -1,32 +1,37 @@
 import os
 
-binary_extensions = (".exe", ".bin", ".dll", ".png", ".jpg")
+textfile_extensions = {
+    ".txt", ".md", ".py", ".java",
+    ".c", ".cpp", ".h", ".hpp", ".js",
+    ".html", ".css", ".rb", ".php",
+    ".ts", ".go", ".rs", ".swift",
+    ".kt", ".sh", ".cs", ".lua",
+    ".html", ".json", ".bash", ".bat",
+    ".cmd", ".ps1", ".zsh", ".ini",
+    ".cfg", ".conf", ".gradle", 
+    ".gitignore", ".asm", ".s", ".erl",
+    ".hs", ".lhs", ".ex", ".pl", 
+    ".scala", ".sc", ".vb", ".log"
+}
 
 # TODO: This is an example todo!
 
 def is_todo_file(file_path):
-    _, file_extension = os.path.splitext(file_path)
+    filename, file_extension = os.path.splitext(file_path)
 
-    if file_extension in binary_extensions:
-        return False 
-
-    with open(file_path, "rb") as f:
-        read_size = max(os.path.getsize(file_path), 512)
-        chunk = f.read(read_size)
-
-        if b'\0' in chunk: # Infers that the file is not text
+    if file_extension not in textfile_extensions:
+        if os.path.basename(filename).lower() != "makefile":
             return False 
 
-        f.seek(0)
+    with open(file_path, "r") as f:
         try:
-            content = f.read().decode("utf-8")
+            for line in f:
+                if "TODO:" in line:
+                    return True
         except UnicodeDecodeError:
             return False
-        if not "TODO:" in content:
-            return False 
 
-
-    return True 
+    return False
 
 
 def gather_files():
@@ -57,6 +62,8 @@ def print_todo_file(file_path):
 
 
                 print(f"    {box_char}{line_char} * {line[index:]} \x1b[93m(line {i})\x1b[39m")
+
+
 
 
 def main():
