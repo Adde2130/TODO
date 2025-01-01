@@ -1,4 +1,5 @@
 import os
+import time
 
 textfile_extensions = {
     ".txt", ".md", ".py", ".java",
@@ -16,6 +17,19 @@ textfile_extensions = {
 
 # TODO: This is an example todo!
 
+def time_func(func):
+
+    def wrapper(*args, **kwargs):
+        start = time.perf_counter()
+        result = func(*args, **kwargs)
+        end = time.perf_counter()
+        total_time = end - start
+        print(f"Time for {func.__name__}: {total_time}")
+        return result
+
+    return wrapper
+
+
 def is_todo_file(file_path):
     filename, file_extension = os.path.splitext(file_path)
 
@@ -26,7 +40,7 @@ def is_todo_file(file_path):
     with open(file_path, "r") as f:
         try:
             for line in f:
-                if "TODO:" in line:
+                if "TODO" in line:
                     return True
         except UnicodeDecodeError:
             return False
@@ -34,6 +48,7 @@ def is_todo_file(file_path):
     return False
 
 
+@time_func
 def gather_files():
     todo_files = []
     cwd = os.getcwd()
@@ -47,6 +62,7 @@ def gather_files():
             todo_files.append(rel_path)
 
     return todo_files
+
 
 def print_todo_file(file_path):
     print(f"\x1b[96m{file_path}\x1b[39m")
@@ -68,6 +84,9 @@ def print_todo_file(file_path):
 
 def main():
     files = gather_files()
+    if len(files) == 0:
+        return
+
     print("\x1b[94m* " + "-" * 76 + " *")
     for file in files:
         print_todo_file(file)
