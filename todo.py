@@ -1,6 +1,10 @@
 import os
 import time
 
+
+ALLOW_MULTILINE_TODOS = False
+
+
 textfile_extensions = {
     ".txt", ".md", ".py", ".java",
     ".c", ".cpp", ".h", ".hpp", ".js",
@@ -15,7 +19,12 @@ textfile_extensions = {
     ".scala", ".sc", ".vb", ".log"
 }
 
+comments = {
+    "//", "#"
+}
+
 # TODO: This is an example todo!
+#       I hope this works!
 
 def time_func(func):
 
@@ -68,6 +77,7 @@ def print_todo_file(file_path):
     print(f"\x1b[96m{file_path}\x1b[39m")
     with open(file_path, "r") as file:
         i = 0
+        parsing_todo = False
         while line_full := file.readline():
             i += 1
             line = line_full.strip()
@@ -76,10 +86,22 @@ def print_todo_file(file_path):
                 box_char = bytes([192]).decode('cp437')
                 line_char = bytes([196]).decode('cp437')
 
+                parsing_todo = True
 
                 print(f"    {box_char}{line_char} * {line[index:]} \x1b[93m(line {i})\x1b[39m")
-
-
+            elif parsing_todo and ALLOW_MULTILINE_TODOS:
+                comment = ""
+                for c in comments:
+                    if line.startswith(c):
+                        comment = c
+                        break
+                
+                if comment == "":
+                    parsing_todo = False
+                    continue
+                
+                line = line[len(comment):].lstrip()
+                print(" " * 15 + line)
 
 
 def main():
